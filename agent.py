@@ -84,6 +84,9 @@ class SimpleMemory(Memory):
 
     def get_memory(self) -> str:
         return "\n".join(self.memory)
+        
+    def clear(self):
+        self.memory = []
 
 # Flask app
 app = Flask(__name__)
@@ -128,6 +131,12 @@ def history():
             })
     
     return jsonify({'messages': messages})
+
+@app.route('/new_chat', methods=['POST'])
+def new_chat():
+    # Clear the memory
+    memory.clear()
+    return '', 204
 
 if __name__ == '__main__':
     app.run(debug=True)

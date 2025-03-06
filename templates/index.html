@@ -33,6 +33,25 @@
             border-radius: 10px 10px 0 0;
             font-size: 1.2em;
             font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .new-chat-button {
+            background-color: transparent;
+            color: white;
+            border: 1px solid white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .new-chat-button:hover {
+            background-color: white;
+            color: #4a69bd;
         }
         
         .chat-history {
@@ -144,7 +163,10 @@
 </head>
 <body>
     <div class="chat-container">
-        <div class="chat-header">Question Agent</div>
+        <div class="chat-header">
+            <span>Question Agent</span>
+            <button class="new-chat-button" onclick="startNewChat()">New Chat</button>
+        </div>
         <div class="chat-history" id="chatHistory"></div>
         <div class="typing-indicator" id="typingIndicator">
             <span></span>
@@ -243,6 +265,25 @@
                 }
             } catch (error) {
                 console.error('Error loading chat history:', error);
+            }
+        }
+        
+        async function startNewChat() {
+            try {
+                const response = await fetch('/new_chat', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    // Clear chat history display
+                    chatHistory.innerHTML = '';
+                    // Clear input field
+                    messageInput.value = '';
+                    // Focus on input
+                    messageInput.focus();
+                }
+            } catch (error) {
+                console.error('Error starting new chat:', error);
             }
         }
         
