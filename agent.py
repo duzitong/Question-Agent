@@ -1,6 +1,8 @@
 # Standard library imports
 import os
+import time
 from typing import List, Dict, Callable, Tuple
+import logging
 
 # Third-party imports
 from flask import Flask, render_template, request, jsonify
@@ -15,6 +17,13 @@ from memory import Memory
 
 # Load environment variables from .env file
 load_dotenv()
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # Agent class definition
 class Agent:
@@ -64,15 +73,32 @@ class OpenAILLM(LLMInterface):
         )
 
     def generate_response(self, prompt: str) -> str:
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": "You are a helpful AI psychological counselor that guides the user to think."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=150
-        )
-        return response.choices[0].message.content.strip()
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a helpful AI psychological counselor that guides the user to think."},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=300,  # Increase token limit
+                temperature=0.7,
+                stop=["\n\n"]  # Prevent truncation in the middle of paragraphs
+            )
+            
+            content = response.choices[0].message.content.strip()
+            
+            # Check if the response might be truncated (by checking if the last sentence is complete)
+            if content and not content[-1] in {'.', '?', '!', '。', '？', '！'}:
+                # If potentially truncated, add a notice
+                content += " [...Response may be incomplete, try shortening your input...]"
+                
+            return content
+            
+        except Exception as e:
+            # Handle potential API errors
+            error_msg = f"Error generating response: {str(e)}"
+            print(error_msg)  # Log the error
+            return "I apologize, but I cannot provide a complete response at the moment. Please try again later or rephrase your question."
 
 # Simple in-memory implementation
 class SimpleMemory(Memory):
@@ -102,18 +128,29 @@ def index():
 
 @app.route('/chat', methods=['POST'])
 def chat():
+    start_time = time.time()
+    logger.info("Request started")
+    
     user_input = request.json.get('message')
     # Use the agent to process the user's message
     response = agent.run(user_input)
     
     # Return the full conversation history
-    return jsonify({
+    result = jsonify({
         'response': response,
         'history': memory.get_memory().split('\n')
     })
+    
+    logger.info("Request ended")
+    logger.info(f"Request duration: {time.time() - start_time} seconds")
+    
+    return result
 
 @app.route('/history', methods=['GET'])
 def history():
+    start_time = time.time()
+    logger.info("History request started")
+    
     # Return the current conversation history
     messages = []
     history = memory.get_memory().split('\n')
@@ -130,12 +167,24 @@ def history():
                 'sender': 'agent'
             })
     
-    return jsonify({'messages': messages})
+    result = jsonify({'messages': messages})
+    
+    logger.info("History request ended")
+    logger.info(f"History request duration: {time.time() - start_time} seconds")
+    
+    return result
 
 @app.route('/new_chat', methods=['POST'])
 def new_chat():
+    start_time = time.time()
+    logger.info("New chat request started")
+    
     # Clear the memory
     memory.clear()
+    
+    logger.info("New chat request ended")
+    logger.info(f"New chat request duration: {time.time() - start_time} seconds")
+    
     return '', 204
 
 if __name__ == '__main__':
