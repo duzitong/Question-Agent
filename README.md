@@ -20,6 +20,40 @@ Question Agent is a web application that creates an interactive chat interface w
 3. Generate contextually relevant responses
 4. Provide guiding questions that lead users toward their own insights
 
+## Use Cases
+
+Question Agent can be particularly valuable in several scenarios:
+
+### Personal Growth & Self-Reflection
+- Working through personal decisions or dilemmas
+- Exploring career choices and professional development
+- Understanding emotional responses to situations
+- Developing better self-awareness
+
+### Learning & Education
+- Breaking down complex problems into manageable steps
+- Developing critical thinking skills
+- Exploring different perspectives on academic topics
+- Strengthening analytical reasoning
+
+### Problem-Solving
+- Analyzing business challenges
+- Working through technical issues
+- Developing project strategies
+- Evaluating different solution approaches
+
+### Professional Development
+- Preparing for important conversations or presentations
+- Developing leadership skills
+- Improving decision-making processes
+- Enhancing communication strategies
+
+The agent achieves these by:
+- Asking open-ended questions that promote deeper thinking
+- Encouraging users to examine assumptions
+- Helping users identify patterns in their thinking
+- Guiding users to develop their own solutions
+
 ## Architecture
 
 The application follows a modular design with the following components:
