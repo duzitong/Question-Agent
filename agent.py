@@ -67,7 +67,7 @@ class OpenAILLM(LLMInterface):
         response = self.client.chat.completions.create(
             model=self.model,
             messages=[
-                {"role": "system", "content": "You are a helpful AI psychological counselor."},
+                {"role": "system", "content": "You are a helpful AI psychological counselor that guides the user to think."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=150
